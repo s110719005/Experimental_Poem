@@ -46,6 +46,11 @@ public class Book : MonoBehaviour
         transform.DOMoveZ(originZ, 0.3f).SetEase(Ease.InExpo);
         selctedSprite.DOFade(0f, 0.3f);
     }
+    public void DeSelectAnimationInstant()
+    {
+        transform.DOMoveZ(originZ, 0).SetEase(Ease.InExpo);
+        selctedSprite.DOFade(0f, 0);
+    }
 
 
 }

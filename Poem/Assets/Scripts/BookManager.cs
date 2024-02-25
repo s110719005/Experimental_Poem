@@ -120,28 +120,31 @@ public class BookManager : MonoBehaviour
         books[currentSelectionIndex] = null;
         books[bookIndex] = currentSelection;
         books[currentSelectionIndex] = bookToChange;
-        if(CorrectCheck())
-        {
-            //all correct animation;
-        }
-        //check correct
+        
     }
 
     private bool CorrectCheck()
     {
-        for(int i = 0; i < bookCount; i++)
-        {
-            if((bookCount - 1 - i) != books[i].CorrectIndex) { Debug.Log("Not correct yet"); return false;  }
-        }
+        // for(int i = 0; i < bookCount; i++)
+        // {
+        //     if((bookCount - 1 - i) != books[i].CorrectIndex) { Debug.Log("Not correct yet"); return false;  }
+        // }
         Debug.Log("All correct!");
         isCorrect = true;
         return true;
     }
 
-    private void CorrectAnimation()
+    private IEnumerator CorrectAnimation()
     {
-        
+        yield return new WaitForSeconds(1f);
+        for(int i = 0; i < bookCount; i++)
+        {
+            books[i].transform.DOMoveZ(books[i].transform.position.z - 0.05f, 0.5f).SetEase(Ease.InQuart);
+            yield return new WaitForSeconds(0.1f);
+        }
+        yield return null;
     }
+
     private void StopChanging()
     {
         isChanging = false;
@@ -149,6 +152,11 @@ public class BookManager : MonoBehaviour
         currentHover.DeSelectAnimation();
         currentSelection = null;
         currentSelectionIndex = -1;
+        if(CorrectCheck())
+        {
+            StartCoroutine(CorrectAnimation());
+            return;
+        }
     }
     private void StartChanging()
     {
