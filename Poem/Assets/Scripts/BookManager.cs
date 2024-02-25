@@ -7,12 +7,21 @@ using UnityEngine;
 
 public class BookManager : MonoBehaviour
 {
+    public static BookManager Instance;
+    private void Awake() 
+    {
+        if(Instance == null) { Instance = this;}
+        else { Destroy(this); }
+    }
+    
     [SerializeField]
     private GameObject bookPrefab;
     [SerializeField]
     private BookData bookData;
     [SerializeField]
     private Transform spawnStartPoint;
+    [SerializeField]
+    private AudioSource audioSource;
 
     private List<int> unusedSentenceIndexs;
     private List<Book> books;
@@ -125,10 +134,10 @@ public class BookManager : MonoBehaviour
 
     private bool CorrectCheck()
     {
-        // for(int i = 0; i < bookCount; i++)
-        // {
-        //     if((bookCount - 1 - i) != books[i].CorrectIndex) { Debug.Log("Not correct yet"); return false;  }
-        // }
+        for(int i = 0; i < bookCount; i++)
+        {
+            if((bookCount - 1 - i) != books[i].CorrectIndex) { Debug.Log("Not correct yet"); return false;  }
+        }
         Debug.Log("All correct!");
         isCorrect = true;
         return true;
@@ -139,10 +148,15 @@ public class BookManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
         for(int i = 0; i < bookCount; i++)
         {
-            books[i].transform.DOMoveZ(books[i].transform.position.z - 0.05f, 0.5f).SetEase(Ease.InQuart);
+            books[i].transform.DOMoveZ(books[i].transform.position.z - 0.05f, 0.5f).SetEase(Ease.InQuart).OnComplete(PlayBookSound);
             yield return new WaitForSeconds(0.1f);
         }
         yield return null;
+    }
+
+    public void PlayBookSound()
+    {
+        audioSource.Play();
     }
 
     private void StopChanging()
@@ -150,6 +164,7 @@ public class BookManager : MonoBehaviour
         isChanging = false;
         currentSelection.DeSelectAnimation();
         currentHover.DeSelectAnimation();
+        audioSource.Play();
         currentSelection = null;
         currentSelectionIndex = -1;
         if(CorrectCheck())

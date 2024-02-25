@@ -43,7 +43,7 @@ public class Book : MonoBehaviour
 
     public void DeSelectAnimation()
     {
-        transform.DOMoveZ(originZ, 0.3f).SetEase(Ease.InExpo);
+        transform.DOMoveZ(originZ, 0.3f).SetEase(Ease.InExpo).OnComplete(BookManager.Instance.PlayBookSound);
         selctedSprite.DOFade(0f, 0.3f);
     }
     public void DeSelectAnimationInstant()
