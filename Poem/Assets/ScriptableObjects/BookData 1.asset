@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e48d905a29bc6234e8863b6f41e7c361, type: 3}
-  m_Name: BookData
+  m_Name: BookData 1
   m_EditorClassIdentifier: 
   bookModels:
   - {fileID: 100000, guid: cba00f75539bc564fabb9136fccfac6c, type: 3}
@@ -22,11 +22,9 @@ MonoBehaviour:
   - {fileID: 6504727120039684618, guid: ce1b5f565079d204aa5a5b1456dc27d4, type: 3}
   - {fileID: 1742605757630524745, guid: f90f58cf7b432c64a8d1da6b81f8fb80, type: 3}
   sentences:
-  - This is a word we use to plug
-  - holes with. It's the right size for those warm.
-  - blanks in speech, for those red heart-
-  - shaped vacancies on the page that look nothing
-  - like real hearts. Add lace
-  - and you can sell
-  - it. We insert it also in the one empty
-  - space on the printed form
+  - that comes with no instructions. There are whole
+  - magazines with not much in them
+  - but the word love, you can
+  - rub it all over your body and you
+  - can cook with it too. How do we know
+  - it isn't what goes on at the cool
