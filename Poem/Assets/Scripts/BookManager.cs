@@ -1,6 +1,8 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using DG.Tweening;
 using UnityEngine;
 
 public class BookManager : MonoBehaviour
@@ -14,16 +16,26 @@ public class BookManager : MonoBehaviour
 
     private List<int> unusedSentenceIndexs;
     private List<Book> books;
+
+    private int currentHoverIndex;
+    private int currentSelectionIndex;
+    private Book currentHover;
+    private Book currentSelection;
+    private int bookCount;
+    private bool isChanging;
+    private bool isCorrect;
+
     // Start is called before the first frame update
     void Start()
     {
         //generate books
         unusedSentenceIndexs = new List<int>();
         books = new List<Book>();
-        for(int i = 0; i < bookData.Setences.Count; i++)
+        bookCount = bookData.Setences.Count;
+        for(int i = 0; i < bookCount; i++)
         {
             var book = Instantiate(bookPrefab, spawnStartPoint.position + new Vector3(0, 0.05f * i, 0), Quaternion.identity, transform);
-            var random = Random.Range(0, bookData.BookModels.Count);
+            var random = UnityEngine.Random.Range(0, bookData.BookModels.Count);
             Instantiate(bookData.BookModels[random], book.transform);
             unusedSentenceIndexs.Add(i);
             if(book.TryGetComponent<Book>(out Book component))
@@ -31,9 +43,9 @@ public class BookManager : MonoBehaviour
                 books.Add(component);
             }
         }
-        for(int j = 0; j < bookData.Setences.Count; j++)
+        for(int j = 0; j < bookCount; j++)
         {
-            var random = Random.Range(0, unusedSentenceIndexs.Count);
+            var random = UnityEngine.Random.Range(0, unusedSentenceIndexs.Count);
             var currenIndex = unusedSentenceIndexs[random];
             if(currenIndex == 0)
             {
@@ -46,11 +58,100 @@ public class BookManager : MonoBehaviour
             books[j].SetCorrectIndex(currenIndex);
             unusedSentenceIndexs.Remove(currenIndex);
         }
+
+        currentHoverIndex = -1;
     }
 
     // Update is called once per frame
     void Update()
     {
+        if(isChanging) { return; }
+        if(isCorrect) { return; }
+        if(Input.GetKeyDown(KeyCode.S))
+        {
+            if(currentHover && currentHover != currentSelection) { currentHover.DeSelectAnimation(); }
+
+            currentHoverIndex = currentHoverIndex - 1;
+            if(currentHoverIndex < 0) { currentHoverIndex = bookCount - 1;}
+            if(currentHoverIndex == currentSelectionIndex) 
+            { 
+                currentHoverIndex = currentHoverIndex - 1; 
+                if(currentHoverIndex >= bookCount) { currentHoverIndex = 0;}
+            }
+            currentHover = books[currentHoverIndex];
+            currentHover.SelectAnimation();
+        }
+        else if(Input.GetKeyDown(KeyCode.W))
+        {
+            if(currentHover && currentHover != currentSelection) { currentHover.DeSelectAnimation(); }
+
+            currentHoverIndex = currentHoverIndex + 1;
+            if(currentHoverIndex >= bookCount) { currentHoverIndex = 0;}
+            if(currentHoverIndex == currentSelectionIndex) 
+            { 
+                currentHoverIndex = currentHoverIndex + 1; 
+                if(currentHoverIndex >= bookCount) { currentHoverIndex = 0;}
+            }
+            currentHover = books[currentHoverIndex];
+            currentHover.SelectAnimation();
+
+        }
+        if(Input.GetKeyDown(KeyCode.Space) && currentHover)
+        {
+            if(!currentSelection) 
+            { 
+                currentSelection = currentHover; 
+                currentSelectionIndex = currentHoverIndex;
+            }
+            else if(currentSelection && currentSelection != currentHover)
+            {
+                ExchangeBook(currentHover, currentHoverIndex);
+            }
+        }
+    }
+
+    private void ExchangeBook(Book bookToChange, int bookIndex)
+    {
+        StartChanging();
+        Vector3 tempPosition = currentSelection.transform.position;
+        currentSelection.transform.DOMove(bookToChange.transform.position, 1f).OnComplete(StopChanging);
+        bookToChange.transform.DOMove(tempPosition, 1f);
+        books[bookIndex] = null;
+        books[currentSelectionIndex] = null;
+        books[bookIndex] = currentSelection;
+        books[currentSelectionIndex] = bookToChange;
+        if(CorrectCheck())
+        {
+            //all correct animation;
+        }
+        //check correct
+    }
+
+    private bool CorrectCheck()
+    {
+        for(int i = 0; i < bookCount; i++)
+        {
+            if((bookCount - 1 - i) != books[i].CorrectIndex) { Debug.Log("Not correct yet"); return false;  }
+        }
+        Debug.Log("All correct!");
+        isCorrect = true;
+        return true;
+    }
+
+    private void CorrectAnimation()
+    {
         
+    }
+    private void StopChanging()
+    {
+        isChanging = false;
+        currentSelection.DeSelectAnimation();
+        currentHover.DeSelectAnimation();
+        currentSelection = null;
+        currentSelectionIndex = -1;
+    }
+    private void StartChanging()
+    {
+        isChanging = true;
     }
 }
