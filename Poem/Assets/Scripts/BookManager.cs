@@ -17,7 +17,7 @@ public class BookManager : MonoBehaviour
     [SerializeField]
     private GameObject bookPrefab;
     [SerializeField]
-    private BookData bookData;
+    private List<BookData> bookDatas;
     [SerializeField]
     private Transform spawnStartPoint;
     [SerializeField]
@@ -34,41 +34,18 @@ public class BookManager : MonoBehaviour
     private bool isChanging;
     private bool isCorrect;
 
+    private int currentLevel;
+
     // Start is called before the first frame update
     void Start()
     {
         //generate books
         unusedSentenceIndexs = new List<int>();
         books = new List<Book>();
-        bookCount = bookData.Setences.Count;
-        for(int i = 0; i < bookCount; i++)
-        {
-            var book = Instantiate(bookPrefab, spawnStartPoint.position + new Vector3(0, 0.05f * i, 0), Quaternion.identity, transform);
-            var random = UnityEngine.Random.Range(0, bookData.BookModels.Count);
-            Instantiate(bookData.BookModels[random], book.transform);
-            unusedSentenceIndexs.Add(i);
-            if(book.TryGetComponent<Book>(out Book component))
-            {
-                books.Add(component);
-            }
-        }
-        for(int j = 0; j < bookCount; j++)
-        {
-            var random = UnityEngine.Random.Range(0, unusedSentenceIndexs.Count);
-            var currenIndex = unusedSentenceIndexs[random];
-            if(currenIndex == 0)
-            {
-                books[j].SetTitle(bookData.Setences[currenIndex], true);
-            }
-            else
-            {
-                books[j].SetTitle(bookData.Setences[currenIndex]);
-            }
-            books[j].SetCorrectIndex(currenIndex);
-            unusedSentenceIndexs.Remove(currenIndex);
-        }
-
         currentHoverIndex = -1;
+        currentLevel = 0;
+        Init(currentLevel);
+
     }
 
     // Update is called once per frame
@@ -119,6 +96,54 @@ public class BookManager : MonoBehaviour
         }
     }
 
+    private void Init(int index)
+    {
+        bookCount = bookDatas[index].Setences.Count;
+        for(int i = 0; i < bookCount; i++)
+        {
+            var book = Instantiate(bookPrefab, spawnStartPoint.position + new Vector3(0, 0.05f * i, 0), Quaternion.identity, transform);
+            var random = UnityEngine.Random.Range(0, bookDatas[index].BookModels.Count);
+            Instantiate(bookDatas[index].BookModels[random], book.transform);
+            unusedSentenceIndexs.Add(i);
+            if(book.TryGetComponent<Book>(out Book component))
+            {
+                books.Add(component);
+            }
+        }
+        for(int j = 0; j < bookCount; j++)
+        {
+            var random = UnityEngine.Random.Range(0, unusedSentenceIndexs.Count);
+            var currenIndex = unusedSentenceIndexs[random];
+            if(currenIndex == 0)
+            {
+                books[j].SetTitle(bookDatas[index].Setences[currenIndex], true);
+            }
+            else
+            {
+                books[j].SetTitle(bookDatas[index].Setences[currenIndex]);
+            }
+            books[j].SetCorrectIndex(currenIndex);
+            unusedSentenceIndexs.Remove(currenIndex);
+        }
+    }
+
+    private void Reset()
+    {
+        for(int i = 0; i < bookCount; i++)
+        {
+            Destroy(books[i].gameObject);
+        }
+        books.Clear();
+        unusedSentenceIndexs.Clear();
+        currentHoverIndex = -1;
+        currentSelectionIndex = -1;
+        currentHover = null;
+        currentSelection = null;
+        bookCount = 0;
+        isChanging = false;
+        isCorrect = false;
+    }
+
     private void ExchangeBook(Book bookToChange, int bookIndex)
     {
         StartChanging();
@@ -150,6 +175,13 @@ public class BookManager : MonoBehaviour
         {
             books[i].transform.DOMoveZ(books[i].transform.position.z - 0.05f, 0.5f).SetEase(Ease.InQuart).OnComplete(PlayBookSound);
             yield return new WaitForSeconds(0.1f);
+        }
+        yield return new WaitForSeconds(1f);
+        currentLevel ++;
+        if(currentLevel < bookDatas.Count) 
+        { 
+            Reset();
+            Init(currentLevel); 
         }
         yield return null;
     }
