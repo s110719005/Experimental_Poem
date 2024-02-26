@@ -604,7 +604,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bookPrefab: {fileID: 7411878903635588060, guid: 610e28f9cc7728947951c89a50ca551a, type: 3}
-  bookData: {fileID: 11400000, guid: 30c2c21713ea62e469c84366b6a23242, type: 2}
+  bookDatas:
+  - {fileID: 11400000, guid: 30c2c21713ea62e469c84366b6a23242, type: 2}
+  - {fileID: 11400000, guid: 93dd60e4479fab641895cd31530de545, type: 2}
+  - {fileID: 11400000, guid: fe66b59b8b6f38d4e94428c44436be96, type: 2}
   spawnStartPoint: {fileID: 194154673}
   audioSource: {fileID: 1921379138}
 --- !u!4 &1921379137
