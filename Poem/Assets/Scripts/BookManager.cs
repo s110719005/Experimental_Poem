@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class BookManager : MonoBehaviour
 {
@@ -22,6 +23,8 @@ public class BookManager : MonoBehaviour
     private Transform spawnStartPoint;
     [SerializeField]
     private AudioSource audioSource;
+    [SerializeField]
+    private GameObject endPanel;
 
     private List<int> unusedSentenceIndexs;
     private List<Book> books;
@@ -45,6 +48,7 @@ public class BookManager : MonoBehaviour
         currentHoverIndex = -1;
         currentLevel = 0;
         Init(currentLevel);
+        endPanel.SetActive(false);
 
     }
 
@@ -183,7 +187,21 @@ public class BookManager : MonoBehaviour
             Reset();
             Init(currentLevel); 
         }
+        else
+        {
+            endPanel.SetActive(true);
+        }
         yield return null;
+    }
+
+    public void BackToTitle()
+    {
+        SceneManager.LoadScene("TitleScene");
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
     }
 
     public void PlayBookSound()
